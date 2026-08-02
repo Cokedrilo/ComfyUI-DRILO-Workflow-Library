@@ -1,0 +1,16 @@
+[project]
+name = "drilo-workflow-library"
+description = "A visual, filterable library for your ComfyUI workflows, plus a Templates section of your own."
+version = "0.2.0"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+dependencies = ["Pillow"]
+authors = [{ name = "Jorge Sarria (Cokedrilo)" }]
+
+[project.urls]
+Repository = "https://github.com/CHANGE-ME/ComfyUI-DRILO-Workflow-Library"
+
+[tool.comfy]
+PublisherId = "CHANGE-ME"
+DisplayName = "🐊 DRILO Workflow Library"
+Icon = ""

@@ -1,0 +1,10 @@
+# Generated mirrors — rebuilt on every sync
+example_workflows/
+
+# User data written by older versions that stored it inside the package
+metadata.json
+thumbnails/
+trash/
+
+__pycache__/
+*.pyc

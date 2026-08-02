@@ -1,0 +1,7 @@
+# Keep line endings stable across Windows, macOS and Linux clones.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.gif binary
+*.webp binary
