@@ -6,6 +6,8 @@ Un custom node de ComfyUI que **no aporta ningún nodo**. Existe para que *elegi
 en qué workflow vas a trabajar* sea una decisión visual y no adivinar por el
 nombre de un archivo.
 
+![La tabla de la biblioteca: miniaturas, tipo de generación, último uso, ejecuciones, función, modelos necesarios y notas](docs/library.png)
+
 1. **Una biblioteca visual**: una tabla con miniatura, tipo de generación, último
    uso, función, modelos necesarios y notas — filtrable, ordenable y editable en
    línea. Se abre con el botón ★ *Library* de la barra lateral de iconos, con
