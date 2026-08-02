@@ -24,7 +24,7 @@ which workflow to work on* a visual decision instead of a guess at a filename.
 Clone into `ComfyUI/custom_nodes/` and restart ComfyUI:
 
 ```bash
-git clone https://github.com/cokedrilo/ComfyUI-DRILO-Workflow-Library
+git clone https://github.com/Cokedrilo/ComfyUI-DRILO-Workflow-Library
 ```
 
 Requires Pillow, which ships with ComfyUI. On first run the pack creates a

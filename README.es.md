@@ -28,7 +28,7 @@ nombre de un archivo.
 Clona dentro de `ComfyUI/custom_nodes/` y reinicia ComfyUI:
 
 ```bash
-git clone https://github.com/cokedrilo/ComfyUI-DRILO-Workflow-Library
+git clone https://github.com/Cokedrilo/ComfyUI-DRILO-Workflow-Library
 ```
 
 Necesita Pillow, que ya viene con ComfyUI. En el primer arranque el paquete crea

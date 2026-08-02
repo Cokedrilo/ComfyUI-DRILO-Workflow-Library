@@ -8,7 +8,7 @@ dependencies = ["Pillow"]
 authors = [{ name = "Jorge Sarria (Cokedrilo)" }]
 
 [project.urls]
-Repository = "https://github.com/cokedrilo/ComfyUI-DRILO-Workflow-Library"
+Repository = "https://github.com/Cokedrilo/ComfyUI-DRILO-Workflow-Library"
 
 [tool.comfy]
 PublisherId = "cokedrilo"
