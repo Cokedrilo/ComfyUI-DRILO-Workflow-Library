@@ -22,7 +22,7 @@ which workflow to work on* a visual decision instead of a guess at a filename.
 Clone into `ComfyUI/custom_nodes/` and restart ComfyUI:
 
 ```bash
-git clone https://github.com/CHANGE-ME/ComfyUI-DRILO-Workflow-Library
+git clone https://github.com/cokedrilo/ComfyUI-DRILO-Workflow-Library
 ```
 
 Requires Pillow, which ships with ComfyUI. On first run the pack creates a
@@ -133,12 +133,24 @@ that would otherwise grow with your collection are handled explicitly:
 - Row-height dragging writes one CSS custom property, not two style properties
   per row.
 
+## Ordering
+
+Click any header to sort by that column. To arrange the table by hand instead,
+grab the **⠿** handle that appears in the ★ column and drop the row where you
+want it: the table switches to manual order and remembers it. The *⠿ Manual
+order* button returns to your arrangement after you have sorted by a column.
+
+Manual order seeds itself from whatever you were looking at, so the first drag
+does not reshuffle everything. Workflows added or imported later sit at the
+bottom until you place them.
+
 ## Table settings
 
 Column widths (drag the right edge of a header), row height (drag the bottom
-edge in the ★ column) and column visibility (right-click the headers, or the
-*Columns* button) are stored in `metadata.json` → `prefs`, so they survive
-across sessions and browsers. Double-click a drag handle to reset that value.
+edge in the ★ column), column visibility (right-click the headers, or the
+*Columns* button) and the active sort are stored in `metadata.json` → `prefs`,
+so they survive across sessions and browsers. Double-click a drag handle to
+reset that value.
 
 ## Files
 

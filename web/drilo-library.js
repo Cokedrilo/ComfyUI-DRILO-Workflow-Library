@@ -276,6 +276,18 @@ const CSS = `
   padding: 10px 14px; box-shadow: 0 -6px 24px rgba(0,0,0,.5);
 }
 .ckd-bulk b { font-size: 12.5px; font-weight: 500; color: #f5c451; }
+
+.ckd-grip {
+  background: none; border: none; color: #4a4a4a; cursor: grab;
+  font-size: 12px; line-height: 1; padding: 0 2px; opacity: 0;
+  transition: opacity .12s, color .12s;
+}
+.ckd-row:hover > .ckd-cell.ckd-star-col .ckd-grip { opacity: 1; }
+.ckd-grip:hover { color: #f5c451; }
+.ckd-grip:active { cursor: grabbing; }
+.ckd-row.ckd-dragging > .ckd-cell { opacity: .4; }
+.ckd-row.ckd-drop-before > .ckd-cell { box-shadow: inset 0 3px 0 -1px #f5c451; }
+.ckd-row.ckd-drop-after > .ckd-cell { box-shadow: inset 0 -3px 0 -1px #f5c451; }
 .ckd-btn.ckd-btn-danger { border-color: #7a3b3b; color: #ffb4b4; }
 .ckd-btn.ckd-btn-danger:hover { border-color: #a85252; background: #2a1c1c; }
 `;
@@ -298,7 +310,14 @@ const GEN_EMOJI = {
 
 const genLabel = (type) => (GEN_EMOJI[type] ? `${GEN_EMOJI[type]} ${type}` : type || "—");
 
-const DEFAULT_PREFS = { widths: {}, rowHeight: 74, hidden: [] };
+const DEFAULT_PREFS = {
+  widths: {},
+  rowHeight: 74,
+  hidden: [],
+  order: [],
+  sortBy: "lastUsed",
+  sortDir: -1,
+};
 
 const state = {
   items: [],
@@ -311,6 +330,7 @@ const state = {
   onlyIssues: false,
   sortBy: "lastUsed",
   sortDir: -1,
+  dragKey: null,
   overlay: null,
   prefs: { ...DEFAULT_PREFS },
   selected: new Set(),
@@ -369,6 +389,9 @@ async function fetchItems() {
   state.prefs = { ...DEFAULT_PREFS, ...(data.prefs || {}) };
   state.prefs.widths = state.prefs.widths || {};
   state.prefs.hidden = state.prefs.hidden || [];
+  state.prefs.order = state.prefs.order || [];
+  state.sortBy = state.prefs.sortBy || "lastUsed";
+  state.sortDir = state.prefs.sortDir === 1 ? 1 : -1;
   state.packModules = data.packModules || [];
 
   // Which node types are available is only fully known in the frontend: LiteGraph's
@@ -472,17 +495,98 @@ function visibleItems() {
       .includes(q);
   });
 
+  rows.sort(comparator());
+  return rows;
+}
+
+function comparator() {
   const dir = state.sortDir;
   const by = state.sortBy;
-  rows.sort((a, b) => {
+
+  if (by === "manual") {
+    const rank = new Map(state.prefs.order.map((key, index) => [key, index]));
+    // Anything not yet in the manual order (new or imported) sinks to the bottom.
+    return (a, b) =>
+      (rank.get(a.key) ?? Number.MAX_SAFE_INTEGER) - (rank.get(b.key) ?? Number.MAX_SAFE_INTEGER) ||
+      a.name.localeCompare(b.name);
+  }
+
+  return (a, b) => {
     if (by === "favorite") return (Number(b.favorite) - Number(a.favorite)) * dir;
     if (by === "runCount") return ((a.runCount || 0) - (b.runCount || 0)) * dir;
     const va = (a[by] ?? "").toString().toLowerCase();
     const vb = (b[by] ?? "").toString().toLowerCase();
     if (va === vb) return a.name.localeCompare(b.name);
     return va < vb ? -dir : dir;
+  };
+}
+
+function persistSort() {
+  state.prefs.sortBy = state.sortBy;
+  state.prefs.sortDir = state.sortDir;
+  savePrefs();
+}
+
+// ---------------------------------------------------------------------------
+// Manual ordering by drag and drop
+// ---------------------------------------------------------------------------
+
+function seedManualOrder() {
+  // Start from what is on screen right now, filters ignored, so the first drag
+  // does not shuffle everything the user was not looking at.
+  const all = [...state.items].sort(comparator());
+  state.prefs.order = all.map((item) => item.key);
+}
+
+function moveInOrder(dragKey, targetKey, before) {
+  if (!state.prefs.order.length) seedManualOrder();
+  const order = state.prefs.order.filter((key) => key !== dragKey);
+  let index = order.indexOf(targetKey);
+  if (index === -1) index = order.length;
+  else if (!before) index += 1;
+  order.splice(index, 0, dragKey);
+  state.prefs.order = order;
+  state.sortBy = "manual";
+  state.sortDir = 1;
+  persistSort();
+}
+
+function clearDropMarkers() {
+  for (const row of state.overlay?.querySelectorAll(".ckd-drop-before, .ckd-drop-after") || []) {
+    row.classList.remove("ckd-drop-before", "ckd-drop-after");
+  }
+}
+
+function enableRowDragging(body) {
+  body.addEventListener("dragover", (e) => {
+    if (!state.dragKey) return;
+    const row = e.target.closest?.(".ckd-row");
+    if (!row || row.dataset.key === state.dragKey) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    // A display:contents row has no box of its own, so measure the cell instead.
+    const box = (e.target.closest(".ckd-cell") || row).getBoundingClientRect();
+    const before = e.clientY < box.top + box.height / 2;
+    clearDropMarkers();
+    row.classList.add(before ? "ckd-drop-before" : "ckd-drop-after");
   });
-  return rows;
+
+  body.addEventListener("drop", (e) => {
+    if (!state.dragKey) return;
+    const row = e.target.closest?.(".ckd-row");
+    if (!row || row.dataset.key === state.dragKey) return;
+    e.preventDefault();
+    const before = row.classList.contains("ckd-drop-before");
+    const dragKey = state.dragKey;
+    state.dragKey = null;
+    clearDropMarkers();
+    moveInOrder(dragKey, row.dataset.key, before);
+    render();
+  });
+
+  body.addEventListener("dragleave", (e) => {
+    if (!e.relatedTarget || !body.contains(e.relatedTarget)) clearDropMarkers();
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -705,6 +809,7 @@ function openColumnMenu(x, y) {
 
 function buildRow(item, refresh) {
   const row = el("div", "ckd-row" + (item.favorite ? " ckd-fav" : ""));
+  row.dataset.key = item.key;
 
   // ⭐
   const starCell = el("div", "ckd-cell ckd-star-col");
@@ -733,7 +838,24 @@ function buildRow(item, refresh) {
     refresh();
   });
 
-  starCell.append(pickBox, star, makeRowResizer());
+  const grip = el("button", "ckd-grip", "⠿");
+  grip.draggable = true;
+  grip.title = "Drag to reorder — switches the table to manual order";
+  grip.addEventListener("click", (e) => e.stopPropagation());
+  grip.addEventListener("dragstart", (e) => {
+    e.stopPropagation();
+    state.dragKey = item.key;
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", item.key);
+    row.classList.add("ckd-dragging");
+  });
+  grip.addEventListener("dragend", () => {
+    state.dragKey = null;
+    row.classList.remove("ckd-dragging");
+    clearDropMarkers();
+  });
+
+  starCell.append(pickBox, star, grip, makeRowResizer());
   if (pickBox.checked) row.classList.add("ckd-picked");
 
   // Image
@@ -1265,6 +1387,22 @@ function render() {
     filters.appendChild(issuesBtn);
   }
 
+  if (state.prefs.order.length) {
+    const manualBtn = el(
+      "button",
+      "ckd-btn" + (state.sortBy === "manual" ? " ckd-on" : ""),
+      "⠿ Manual order"
+    );
+    manualBtn.title = "Back to the order you arranged by dragging";
+    manualBtn.addEventListener("click", () => {
+      state.sortBy = "manual";
+      state.sortDir = 1;
+      persistSort();
+      render();
+    });
+    filters.appendChild(manualBtn);
+  }
+
   const resetBtn = el("button", "ckd-btn", "Clear filters");
   resetBtn.addEventListener("click", () => {
     state.search = "";
@@ -1316,6 +1454,7 @@ function render() {
           state.sortBy = col.id;
           state.sortDir = col.id === "lastUsed" ? -1 : 1;
         }
+        persistSort();
         render();
       });
     } else {
@@ -1326,6 +1465,7 @@ function render() {
   scroll.appendChild(head);
 
   const body = el("div", "ckd-grid");
+  enableRowDragging(body);
   scroll.appendChild(body);
   const bulkHost = el("div");
   scroll.appendChild(bulkHost);

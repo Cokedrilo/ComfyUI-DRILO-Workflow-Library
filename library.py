@@ -335,6 +335,10 @@ DEFAULT_PREFS = {
     "widths": {},
     "rowHeight": 74,
     "hidden": [],
+    # Manual row order, plus the sort the table reopens with.
+    "order": [],
+    "sortBy": "lastUsed",
+    "sortDir": -1,
 }
 
 
@@ -638,6 +642,18 @@ async def drilo_prefs(request):
     hidden = body.get("hidden")
     if isinstance(hidden, list):
         prefs["hidden"] = [str(h) for h in hidden]
+
+    order = body.get("order")
+    if isinstance(order, list):
+        prefs["order"] = [str(o) for o in order]
+
+    sort_by = body.get("sortBy")
+    if isinstance(sort_by, str):
+        prefs["sortBy"] = sort_by[:40]
+
+    sort_dir = body.get("sortDir")
+    if isinstance(sort_dir, (int, float)):
+        prefs["sortDir"] = 1 if sort_dir > 0 else -1
 
     save_meta(meta)
     return web.json_response({"ok": True, "prefs": prefs})

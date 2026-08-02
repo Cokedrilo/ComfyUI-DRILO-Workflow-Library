@@ -26,7 +26,7 @@ nombre de un archivo.
 Clona dentro de `ComfyUI/custom_nodes/` y reinicia ComfyUI:
 
 ```bash
-git clone https://github.com/CHANGE-ME/ComfyUI-DRILO-Workflow-Library
+git clone https://github.com/cokedrilo/ComfyUI-DRILO-Workflow-Library
 ```
 
 Necesita Pillow, que ya viene con ComfyUI. En el primer arranque el paquete crea
@@ -145,13 +145,24 @@ explícitamente:
 - Arrastrar el alto de fila escribe una variable CSS, no dos propiedades de
   estilo por fila.
 
+## Ordenación
+
+Pulsa cualquier cabecera para ordenar por esa columna. Para colocar la tabla a
+mano, agarra el tirador **⠿** que aparece en la columna ★ y suelta la fila donde
+quieras: la tabla pasa a orden manual y lo recuerda. El botón *⠿ Manual order*
+devuelve a tu colocación después de haber ordenado por una columna.
+
+El orden manual parte de lo que estuvieras viendo, así que el primer arrastre no
+revuelve todo lo demás. Los workflows añadidos o importados después se quedan al
+final hasta que los coloques.
+
 ## Ajustes de la tabla
 
 El ancho de columna (arrastrando el borde derecho de la cabecera), el alto de
-fila (arrastrando el borde inferior en la columna ★) y las columnas visibles
-(clic derecho en las cabeceras, o el botón *Columns*) se guardan en
-`metadata.json` → `prefs`, así que persisten entre sesiones y navegadores. Doble
-clic en un tirador restablece ese valor.
+fila (arrastrando el borde inferior en la columna ★), las columnas visibles
+(clic derecho en las cabeceras, o el botón *Columns*) y el criterio de
+ordenación activo se guardan en `metadata.json` → `prefs`, así que persisten
+entre sesiones y navegadores. Doble clic en un tirador restablece ese valor.
 
 ## Archivos
 
