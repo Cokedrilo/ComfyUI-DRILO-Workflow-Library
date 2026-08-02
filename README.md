@@ -7,6 +7,8 @@ which workflow to work on* a visual decision instead of a guess at a filename.
 
 ![The library table: thumbnails, generation type, last used, run count, function, required models and notes](docs/library.png)
 
+<sub>Workflow and model names in the screenshot are placeholders.</sub>
+
 1. **A visual library**: a table with thumbnail, generation type, last used,
    function, required models and notes — filterable, sortable and editable
    in place. Open it from the ★ *Library* button in the sidebar rail, with

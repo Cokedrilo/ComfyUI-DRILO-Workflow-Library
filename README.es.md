@@ -8,6 +8,8 @@ nombre de un archivo.
 
 ![La tabla de la biblioteca: miniaturas, tipo de generación, último uso, ejecuciones, función, modelos necesarios y notas](docs/library.png)
 
+<sub>Los nombres de workflows y modelos de la captura son de ejemplo.</sub>
+
 1. **Una biblioteca visual**: una tabla con miniatura, tipo de generación, último
    uso, función, modelos necesarios y notas — filtrable, ordenable y editable en
    línea. Se abre con el botón ★ *Library* de la barra lateral de iconos, con
